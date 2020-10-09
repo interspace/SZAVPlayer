@@ -171,7 +171,7 @@ extension SZAVPlayer {
         let assetLoader = createAssetLoader(video: video)
         assetLoader.loadAsset(isLocalURL: config.isLocalURL) { (asset) in
             if let _ = self.player {
-                self.replacePalyerItem(asset: asset)
+                self.replacePlayerItem(asset: asset)
             } else {
                 self.createPlayer(asset: asset)
             }
@@ -294,7 +294,7 @@ extension SZAVPlayer {
 
     // MARK: Private
 
-    private func replacePalyerItem(asset: AVURLAsset) {
+    private func replacePlayerItem(asset: AVURLAsset) {
         guard let player = player else { return }
 
         pause()
