@@ -81,37 +81,44 @@ extension SZAVPlayerAssetLoader {
             return false
         }
 
-        // use cached info first
-        if let contentInfo = SZAVPlayerDatabase.shared.contentInfo(uniqueID: self.uniqueID),
-            SZAVPlayerContentInfo.isNotExpired(updated: contentInfo.updated)
-        {
-            self.fillInWithLocalData(infoRequest, contentInfo: contentInfo)
-            loadingRequest.finishLoading()
-
-            return true
-        }
-
-        let request = contentInfoRequest(loadingRequest: loadingRequest)
-        let configuration = URLSessionConfiguration.default
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        let session = URLSession(configuration: configuration, delegate: nil, delegateQueue: nil)
-        let task = session.downloadTask(with: request) { (_, response, error) in
-            self.handleContentInfoResponse(loadingRequest: loadingRequest,
-                                           infoRequest: infoRequest,
-                                           response: response,
-                                           error: error)
-        }
-
-        self.currentRequest = SZAVPlayerContentInfoRequest(
-            resourceUrl: video.url,
-            loadingRequest: loadingRequest,
-            infoRequest: infoRequest,
-            task: task
-        )
-
-        task.resume()
+        let contentInfo = SZAVPlayerContentInfo(uniqueID: self.uniqueID,
+                                                   mimeType: video.mimeType,
+                                                   contentLength: Int64(video.contentLength),
+                                                   isByteRangeAccessSupported: true)
+        self.fillInWithLocalData(infoRequest, contentInfo: contentInfo)
+        loadingRequest.finishLoading()
 
         return true
+
+//        // use cached info first
+//        if let contentInfo = SZAVPlayerDatabase.shared.contentInfo(uniqueID: self.uniqueID),
+//            SZAVPlayerContentInfo.isNotExpired(updated: contentInfo.updated)
+//        {
+//            self.fillInWithLocalData(infoRequest, contentInfo: contentInfo)
+//            loadingRequest.finishLoading()
+//
+//            return true
+//        }
+//
+//        let request = contentInfoRequest(loadingRequest: loadingRequest)
+//        let configuration = URLSessionConfiguration.default
+//        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+//        let session = URLSession(configuration: configuration, delegate: nil, delegateQueue: nil)
+//        let task = session.downloadTask(with: request) { (_, response, error) in
+//            self.handleContentInfoResponse(loadingRequest: loadingRequest,
+//                                           infoRequest: infoRequest,
+//                                           response: response,
+//                                           error: error)
+//        }
+//
+//        self.currentRequest = SZAVPlayerContentInfoRequest(
+//            resourceUrl: video.url,
+//            loadingRequest: loadingRequest,
+//            infoRequest: infoRequest,
+//            task: task
+//        )
+//
+//        task.resume()
     }
 
     private func handleContentInfoResponse(loadingRequest: AVAssetResourceLoadingRequest,
