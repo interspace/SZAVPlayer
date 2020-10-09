@@ -9,9 +9,14 @@ import UIKit
 import AVKit
 
 public struct VideoConfig {
-    let url: URL
-    let contentLength: Int
-    let mimeType: String = "video/mp4"
+    public init(url: URL, contentLength: Int) {
+        self.url = url
+        self.contentLength = contentLength
+    }
+
+    public let url: URL
+    public let contentLength: Int
+    public let mimeType: String = "video/mp4"
 }
 
 public struct SZAVPlayerConfig {
