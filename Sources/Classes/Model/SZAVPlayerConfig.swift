@@ -10,7 +10,8 @@ import AVKit
 
 public struct VideoConfig {
     let url: URL
-    let asset: AVAsset? = nil
+    let contentLength: Int
+    let mimeType: String = "video/mp4"
 }
 
 public struct SZAVPlayerConfig {
@@ -22,14 +23,15 @@ public struct SZAVPlayerConfig {
     public var isLocalURL: Bool = false
     public var videoGravity: AVLayerVideoGravity = .resizeAspect
 
-    public init(url: URL, isVideo: Bool = true, isVideoOutputEnabled: Bool = false) {
-        self.video = .init(url: url)
+    public init(video: VideoConfig, isVideo: Bool = true, isVideoOutputEnabled: Bool = false) {
+        self.video = video
         self.isVideo = isVideo
         self.isVideoOutputEnabled = isVideoOutputEnabled
     }
 
     public static var `default`: SZAVPlayerConfig {
-        return SZAVPlayerConfig(url: URL(string: "fakeURL.com")!)
+        return SZAVPlayerConfig(video: .init(url: URL(string: "fakeURL.com")!,
+                                             contentLength: 0))
     }
 
 }
