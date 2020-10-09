@@ -22,7 +22,7 @@ public class SZAVPlayerAssetLoader: NSObject {
 
     public weak var delegate: SZAVPlayerAssetLoaderDelegate?
     public var uniqueID: String = "defaultUniqueID"
-    public let url: URL
+    public let video: VideoConfig
     public var urlAsset: AVURLAsset?
 
     private let loaderQueue = DispatchQueue(label: "com.SZAVPlayer.loaderQueue")
@@ -34,8 +34,8 @@ public class SZAVPlayerAssetLoader: NSObject {
     private var isCancelled: Bool = false
     private var loadedLength: Int64 = 0
 
-    init(url: URL) {
-        self.url = url
+    init(video: VideoConfig) {
+        self.video = video
         super.init()
     }
 
@@ -46,8 +46,8 @@ public class SZAVPlayerAssetLoader: NSObject {
     public func loadAsset(isLocalURL: Bool = false, completion: @escaping (AVURLAsset) -> Void) {
         var asset: AVURLAsset
         if isLocalURL {
-            asset = AVURLAsset(url: url)
-        } else if let urlWithSchema = url.withScheme(SZAVPlayerItemScheme) {
+            asset = AVURLAsset(url: video.url)
+        } else if let urlWithSchema = video.url.withScheme(SZAVPlayerItemScheme) {
             asset = AVURLAsset(url: urlWithSchema)
             asset.resourceLoader.setDelegate(self, queue: loaderQueue)
         } else {
@@ -103,7 +103,7 @@ extension SZAVPlayerAssetLoader {
         }
 
         self.currentRequest = SZAVPlayerContentInfoRequest(
-            resourceUrl: url,
+            resourceUrl: video.url,
             loadingRequest: loadingRequest,
             infoRequest: infoRequest,
             task: task
@@ -185,13 +185,13 @@ extension SZAVPlayerAssetLoader {
         }
 
         let loader = SZAVPlayerDataLoader(uniqueID: uniqueID,
-                                          url: url,
+                                          url: video.url,
                                           range: requestedRange,
                                           callbackQueue: loaderQueue)
         loader.delegate = self
         let dataRequest: SZAVPlayerDataRequest = {
             return SZAVPlayerDataRequest(
-                resourceUrl: url,
+                resourceUrl: video.url,
                 loadingRequest: loadingRequest,
                 dataRequest: avDataRequest,
                 loader: loader,
@@ -365,7 +365,7 @@ extension SZAVPlayerAssetLoader {
     }
 
     private func contentInfoRequest(loadingRequest: AVAssetResourceLoadingRequest) -> URLRequest {
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: video.url)
         if let dataRequest = loadingRequest.dataRequest {
             let lowerBound = Int(dataRequest.requestedOffset)
             let upperBound = lowerBound + Int(dataRequest.requestedLength) - 1

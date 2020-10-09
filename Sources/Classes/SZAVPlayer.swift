@@ -100,7 +100,7 @@ public class SZAVPlayer: UIView {
     private(set) public var playerLayer: AVPlayerLayer?
     private(set) public var player: AVPlayer?
     private(set) public var playerItem: AVPlayerItem?
-    private(set) public var currentURLStr: String?
+    private(set) public var currentURL: URL?
     private(set) public var loadedTime: Float64 = 0
 
     private lazy var videoOutput: AVPlayerItemVideoOutput = createVideoOutput()
@@ -158,7 +158,7 @@ extension SZAVPlayer {
     /// - Parameters:
     ///   - config: The config to setup player properly.
     public func setupPlayer(config: SZAVPlayerConfig) {
-        guard let url = URL(string: config.urlStr) else { return }
+        let video = config.video
 
         if let _ = player, let oldAssetLoader = assetLoader {
             oldAssetLoader.cleanup()
@@ -167,8 +167,8 @@ extension SZAVPlayer {
 
         self.config = config
         isReadyToPlay = false
-        currentURLStr = config.urlStr
-        let assetLoader = createAssetLoader(url: url, uniqueID: config.uniqueID)
+        currentURL = video.url
+        let assetLoader = createAssetLoader(video: video)
         assetLoader.loadAsset(isLocalURL: config.isLocalURL) { (asset) in
             if let _ = self.player {
                 self.replacePalyerItem(asset: asset)
@@ -182,11 +182,9 @@ extension SZAVPlayer {
 
     /// Replace playerItem with new urlStr and uniqueID.
     /// - Parameters:
-    ///   - urlStr: The URL value for playing.
-    ///   - uniqueID: The uniqueID to identify wether they are the same audio. If set to nil will use urlStr to create one.
-    public func replace(urlStr: String, uniqueID: String?) {
-        config.urlStr = urlStr
-        config.uniqueID = uniqueID
+    ///   - url: The URL value for playing.
+    public func replace(video: VideoConfig) {
+        config.video = video
         setupPlayer(config: config)
     }
 
@@ -650,9 +648,9 @@ extension SZAVPlayer {
         addNotificationsForPlayer()
     }
 
-    private func createAssetLoader(url: URL, uniqueID: String?) -> SZAVPlayerAssetLoader {
-        let loader = SZAVPlayerAssetLoader(url: url)
-        let finalUniqueID = uniqueID ?? SZAVPlayerFileSystem.uniqueID(url: url)
+    private func createAssetLoader(video: VideoConfig) -> SZAVPlayerAssetLoader {
+        let loader = SZAVPlayerAssetLoader(video: video)
+        let finalUniqueID = SZAVPlayerFileSystem.uniqueID(url: video.url)
         loader.uniqueID = finalUniqueID
         loader.delegate = self
 

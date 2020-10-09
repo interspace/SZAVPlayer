@@ -166,7 +166,7 @@ extension SZAVPlayer {
         self.config = config
         isReadyToPlay = false
         currentURLStr = config.urlStr
-        let assetLoader = createAssetLoader(url: url, uniqueID: config.uniqueID)
+        let assetLoader = createAssetLoader(url: url)
         assetLoader.loadAsset(isLocalURL: config.isLocalURL) { (asset) in
             if let _ = self.player {
                 self.replacePalyerItem(asset: asset)
@@ -181,10 +181,8 @@ extension SZAVPlayer {
     /// Replace playerItem with new urlStr and uniqueID.
     /// - Parameters:
     ///   - urlStr: The URL value for playing.
-    ///   - uniqueID: The uniqueID to identify wether they are the same audio. If set to nil will use urlStr to create one.
-    public func replace(urlStr: String, uniqueID: String?) {
+    public func replace(urlStr: String) {
         config.urlStr = urlStr
-        config.uniqueID = uniqueID
         setupPlayer(config: config)
     }
 
@@ -641,7 +639,7 @@ extension SZAVPlayer {
         addNotificationsForPlayer()
     }
 
-    private func createAssetLoader(url: URL, uniqueID: String?) -> SZAVPlayerAssetLoader {
+    private func createAssetLoader(url: URL) -> SZAVPlayerAssetLoader {
         let loader = SZAVPlayerAssetLoader(url: url)
         let finalUniqueID = uniqueID ?? SZAVPlayerFileSystem.uniqueID(url: url)
         loader.uniqueID = finalUniqueID

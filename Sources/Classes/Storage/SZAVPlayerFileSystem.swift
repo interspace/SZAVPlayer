@@ -105,7 +105,7 @@ extension SZAVPlayerFileSystem {
 extension SZAVPlayerFileSystem {
 
     static func uniqueID(url: URL) -> String {
-        return url.absoluteString.md5
+        return url.deletingPathExtension().lastPathComponent
     }
 
     static func allFiles(path: URL) -> [URL] {
